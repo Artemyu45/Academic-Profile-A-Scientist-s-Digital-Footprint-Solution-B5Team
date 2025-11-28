@@ -1,2 +1,2 @@
-# Sirius-GlobalCertHub-Certificate-Generation-Service-Solution-B5Team-BulBul-Karasiyaki
-Solution for a Sirius GlobalCertHub: Certificate Generation Service Case from team B5
+# Academic-Profile-A-Scientist-s-Digital-Footprint-Solution-B5Team
+Solution for a Academic Profile: A Scientist's Digital Footprint Case from team B5
