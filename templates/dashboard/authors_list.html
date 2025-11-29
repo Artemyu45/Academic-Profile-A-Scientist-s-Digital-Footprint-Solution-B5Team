@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Authors - Academic Profile{% endblock %}
+
+{% block content %}
+<h1>Authors</h1>
+
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="search" class="form-control" placeholder="Search authors..." value="{{ search }}">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Affiliation</th>
+            <th>Citations</th>
+            <th>H-Index</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for author in authors %}
+            <tr>
+                <td>{{ author.full_name }}</td>
+                <td>{{ author.affiliation }}</td>
+                <td>{{ author.citation_count }}</td>
+                <td>{{ author.h_index }}</td>
+                <td>
+                    <a href="{% url 'dashboard:author_detail' author.id %}" class="btn btn-sm btn-info">View</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if previous %}
+    <a href="?page=1" class="btn btn-secondary">First</a>
+    <a href="?page={{ previous }}" class="btn btn-secondary">Previous</a>
+{% endif %}
+
+{% if next %}
+    <a href="?page={{ next }}" class="btn btn-secondary">Next</a>
+{% endif %}
+{% endblock %}

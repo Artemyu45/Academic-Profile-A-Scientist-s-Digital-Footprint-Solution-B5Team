@@ -1,23 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import permissions
-
-# Swagger
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Academic Profile API",
-        default_version='v1',
-        description="API docs for author profile endpoints.",
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('authors.urls')),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('', TemplateView.as_view(template_name='index.html'), name='index'),
+    path('users/', include('users.urls')),
+    path('dashboard/', include('dashboard.urls')),
 ]

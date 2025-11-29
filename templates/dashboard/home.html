@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Academic Profile{% endblock %}
+
+{% block content %}
+<h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <h3>Top Cited Authors</h3>
+        <ul class="list-group">
+            {% for author in top_authors %}
+                <li class="list-group-item">
+                    <a href="{% url 'dashboard:author_detail' author.id %}">{{ author.full_name }}</a>
+                    <span class="badge bg-primary">{{ author.citation_count }} citations</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h3>Most Cited Papers</h3>
+        <ul class="list-group">
+            {% for paper in most_cited_papers %}
+                <li class="list-group-item">
+                    <strong>{{ paper.title }}</strong>
+                    <br><small>{{ paper.author.full_name }} ({{ paper.year }})</small>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
