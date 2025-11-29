@@ -232,6 +232,8 @@ def delete_person_by_id(person_id: int):
 
 # ==================== USERS ENDPOINTS ====================
 
+
+
 @app.post("/users/register", summary="Register new user", tags=["Users Management"])
 def register_user(user: User):
     """Register a new user"""
@@ -354,6 +356,77 @@ def delete_user(user_id: int):
     save_users(users)
 
     return {"message": f"User {user_id} deleted"}
+
+import csv
+from fastapi import APIRouter, HTTPException
+from main import register_user, load_users, load_persons, save_users, save_persons, User
+
+
+router = APIRouter()
+
+@app.post("/users/register_csv", tags=["Users Management"])
+def register_users_from_csv(csv_path: str):
+    """
+    Register multiple users from a CSV file.
+    CSV columns: username, password, is_admin, folk_name
+    """
+    users = load_users()
+    persons = load_persons()
+
+    created = []
+    errors = []
+
+    try:
+        with open(csv_path, newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                try:
+                    user = User(
+                        username=row["username"],
+                        password=row["password"],
+                        is_admin=row.get("is_admin", "false").lower() == "true",
+                        folk_name=row["folk_name"],
+                    )
+                    # --- Reuse logic from register_user ---
+                    if any(u["username"] == user.username for u in users.values()):
+                        raise HTTPException(status_code=400, detail="Username already exists")
+
+                    # Folk handling
+                    if user.folk_name in persons:
+                        folk_id = persons[user.folk_name]["id"]
+                    else:
+                        # Create new folk
+                        new_id = max(int(k) for k in users.keys()) + 1 if users else 1
+                        folk_id = new_id
+                        persons[user.folk_name] = {
+                            "id": folk_id,
+                            "citation_impact": 0,
+                            "publication_count": 0,
+                            "research_field": 0,
+                            "nearest_neighbors": [],
+                            "publication": []
+                        }
+
+                    # Create user
+                    users[folk_id] = {
+                        "id": folk_id,
+                        "username": user.username,
+                        "password": user.password,  # TODO: Replace with hashing
+                        "is_admin": user.is_admin,
+                        "folk_name": user.folk_name
+                    }
+
+                    created.append(user.username)
+                except Exception as e:
+                    errors.append({"row": row, "error": str(e)})
+
+        save_users(users)
+        save_persons(persons)
+
+    except FileNotFoundError:
+        raise HTTPException(status_code=400, detail="CSV file not found")
+
+    return {"created": created, "errors": errors}
 
 
 # ==================== WORKS ENDPOINTS ====================
